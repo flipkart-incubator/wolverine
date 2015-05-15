@@ -1,10 +1,11 @@
-package flipkart.pricing.wolverine.expiry;
+package flipkart.pricing.wolverine.expiry.core;
 
 import com.netflix.curator.framework.CuratorFramework;
 import com.netflix.curator.framework.recipes.leader.LeaderSelector;
 import com.netflix.curator.framework.recipes.leader.LeaderSelectorListener;
 import com.netflix.curator.framework.state.ConnectionState;
 import com.sun.corba.se.impl.orbutil.concurrent.ReentrantMutex;
+import flipkart.pricing.wolverine.expiry.daemon.ControlledThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +25,6 @@ class LeaderSelectorListenerJobExecutor implements LeaderSelectorListener {
     public void takeLeadership(CuratorFramework client) throws Exception {
         logger.info(" got elected. ");
         mutex.acquire();
-        job.restart();
         job.run();
         mutex.release();
         logger.info(" leaving leadership. ");

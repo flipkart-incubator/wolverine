@@ -1,8 +1,12 @@
-package flipkart.pricing.wolverine.expiry;
+package flipkart.pricing.wolverine.expiry.core;
 
 import com.netflix.curator.framework.CuratorFramework;
+import com.netflix.curator.framework.CuratorFrameworkFactory;
 import com.netflix.curator.framework.recipes.leader.LeaderSelector;
 import com.netflix.curator.framework.recipes.leader.LeaderSelectorListener;
+import com.netflix.curator.retry.ExponentialBackoffRetry;
+import flipkart.pricing.wolverine.expiry.daemon.ControlledThread;
+import flipkart.pricing.wolverine.expiry.model.CuratorFrameworkConfig;
 
 public class MasterElector {
 
@@ -13,11 +17,16 @@ public class MasterElector {
     private LeaderSelector leaderSelector;
 
 
-    public MasterElector(ControlledThread job, CuratorFramework curatorFramework, String leaderPath) {
+    public MasterElector(ControlledThread job, CuratorFrameworkConfig config) {
         this.job = job;
-        this.curatorFramework = curatorFramework;
+        this.curatorFramework = CuratorFrameworkFactory.newClient(
+                        config.zookeeperConnect(),
+                        new ExponentialBackoffRetry(
+                                config.getBaseSleepTime(),
+                                config.getNumberOfRetries()
+                        ));
         this.curatorFramework.start();
-        this.leaderPath = leaderPath;
+        this.leaderPath = config.getLeaderPath();
     }
 
     public void start() throws Exception {
