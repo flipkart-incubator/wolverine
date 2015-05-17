@@ -3,17 +3,25 @@ package flipkart.pricing.wolverine.expiry.daemon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+/*
+    An implementation of ControlledThread this manages sleep interval, exponential back off etc. User need to implement work method.
+ */
 public abstract class Daemon implements ControlledThread {
     private static final Logger logger = LoggerFactory.getLogger(Daemon.class);
     public static final int MINUTE = 60 * 1000;
     public static final int MAX_SLEEP_TIME = 30 * 60 * 1000;
+
+    // time to wait after one successful invocation.
     private final int minSleepTime;
+
+    // max time of exponential back off.
     private final int maxSleepTime;
+
+    // time to retry after an error occurred.
     private final int maxSleepTimeAtError;
 
-    public Daemon(int minSleepTime){
-        this(minSleepTime, MAX_SLEEP_TIME);
+    public Daemon(int intervalOfJobs){
+        this(intervalOfJobs, MAX_SLEEP_TIME);
     }
 
     public Daemon(int minSleepTime, int maxSleepTime){
@@ -32,6 +40,9 @@ public abstract class Daemon implements ControlledThread {
         alive = false;
     }
 
+    protected boolean status(){
+        return this.alive;
+    }
 
     @Override
     public void run() {
@@ -63,6 +74,11 @@ public abstract class Daemon implements ControlledThread {
             ignore.printStackTrace();
         }
     }
+
+    /*
+        This method should be one unit of work. On completing the work return true or false based on wheather the job was successfull or not.
+        In case while executing the job, the process. Looses leadership, then we might have 2 parrallel jobs running. If the use case is critical on 2 jobs running, keep checking status() method to fail fast.
+     */
 
     protected abstract boolean work() throws Exception;
 
