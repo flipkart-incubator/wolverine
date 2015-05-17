@@ -1,6 +1,6 @@
 package flipkart.pricing.wolverine.expiry.model;
 
-public class CuratorFrameworkConfig {
+public class MasterElectorConfig {
 
     private final String connectPath;
 
@@ -10,7 +10,7 @@ public class CuratorFrameworkConfig {
 
     private final String leaderPath;
 
-    public CuratorFrameworkConfig(String connectPath, String leaderPath) {
+    public MasterElectorConfig(String connectPath, String leaderPath) {
         this.connectPath = connectPath;
         this.leaderPath = leaderPath;
     }
@@ -44,7 +44,7 @@ public class CuratorFrameworkConfig {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        CuratorFrameworkConfig that = (CuratorFrameworkConfig) o;
+        MasterElectorConfig that = (MasterElectorConfig) o;
 
         if (baseSleepTime != that.baseSleepTime) return false;
         if (numberOfRetries != that.numberOfRetries) return false;
