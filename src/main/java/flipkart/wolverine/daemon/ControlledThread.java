@@ -1,4 +1,4 @@
-package flipkart.pricing.wolverine.expiry.daemon;
+package flipkart.wolverine.daemon;
 /*
 
     The Thread should have all logic what user need to execute once it becomes leader.

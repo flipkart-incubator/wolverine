@@ -1,7 +1,7 @@
-package flipkart.pricing.wolverine.expiry.core;
+package flipkart.wolverine.core;
 
 import com.sun.corba.se.impl.orbutil.concurrent.ReentrantMutex;
-import flipkart.pricing.wolverine.expiry.daemon.ControlledThread;
+import flipkart.wolverine.daemon.ControlledThread;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListener;

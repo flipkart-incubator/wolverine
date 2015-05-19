@@ -1,7 +1,7 @@
-package flipkart.pricing.wolverine.expiry.core;
+package flipkart.wolverine.core;
 
-import flipkart.pricing.wolverine.expiry.daemon.ControlledThread;
-import flipkart.pricing.wolverine.expiry.model.MasterElectorConfig;
+import flipkart.wolverine.daemon.ControlledThread;
+import flipkart.wolverine.model.MasterElectorConfig;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;

@@ -1,4 +1,4 @@
-package flipkart.pricing.wolverine.expiry.daemon;
+package flipkart.wolverine.daemon;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +19,7 @@ public abstract class Daemon implements ControlledThread {
 
     // time to retry after an error occurred.
     private final int maxSleepTimeAtError;
+    private final String daemonName;
 
     public Daemon(int intervalOfJobs){
         this(intervalOfJobs, MAX_SLEEP_TIME);
@@ -32,6 +33,7 @@ public abstract class Daemon implements ControlledThread {
         this.minSleepTime = minSleepTime;
         this.maxSleepTime = maxSleepTime;
         this.maxSleepTimeAtError = maxSleepTimeAtError;
+        this.daemonName = this.getClass().getSimpleName();
     }
 
     private volatile boolean alive = true;
@@ -48,7 +50,7 @@ public abstract class Daemon implements ControlledThread {
     public void run() {
         alive = true;
         long sleepTime = minSleepTime;
-        logger.info(" Expiry Daemon started.");
+        logger.info(daemonName+" started.");
         while(alive){
             try {
                 boolean success = work();
@@ -60,11 +62,11 @@ public abstract class Daemon implements ControlledThread {
                 }
                 rest(sleepTime);
             }catch(Exception e){
-                logger.error("Expiry daemon failed to work. Retrying after 1 min.", e);
+                logger.error(daemonName+" failed to work. Retrying after "+maxSleepTimeAtError/MINUTE+" minutes.", e);
                 rest(maxSleepTimeAtError);
             }
         }
-        logger.info(" Stopping expiry daemon.");
+        logger.info("Stopping "+daemonName);
     }
 
     protected void rest(long sleepTime) {

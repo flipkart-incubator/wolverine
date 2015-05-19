@@ -1,7 +1,7 @@
-package flipkart.pricing.wolverine.expiry.core;
+package flipkart.wolverine.core;
 
-import flipkart.pricing.wolverine.expiry.daemon.Daemon;
-import flipkart.pricing.wolverine.expiry.model.MasterElectorConfig;
+import flipkart.wolverine.daemon.Daemon;
+import flipkart.wolverine.model.MasterElectorConfig;
 import org.apache.curator.test.TestingCluster;
 import org.junit.After;
 import org.junit.Assert;

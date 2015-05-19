@@ -1,4 +1,4 @@
-package flipkart.pricing.wolverine.expiry.model;
+package flipkart.wolverine.model;
 
 public class MasterElectorConfig {
 
