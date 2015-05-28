@@ -2,6 +2,9 @@ package flipkart.wolverine.core;
 
 import flipkart.wolverine.daemon.Daemon;
 import flipkart.wolverine.model.MasterElectorConfig;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.test.TestingCluster;
 import org.junit.After;
 import org.junit.Assert;
@@ -14,11 +17,25 @@ public class MasterElectorTest {
 
 
     private TestingCluster testingCluster;
+    private CuratorFramework curatorFramework;
+    private MasterElectorConfig config;
 
     @Before
     public void setUp() throws Exception {
         testingCluster = new TestingCluster(3);
         testingCluster.start();
+        this.config = new MasterElectorConfig(testingCluster.getConnectString(), "/root");
+        this.curatorFramework = getCuratorFramework(config);
+
+    }
+
+    private CuratorFramework getCuratorFramework(MasterElectorConfig config) {
+        return  CuratorFrameworkFactory.newClient(
+                config.zookeeperConnect(),
+                new ExponentialBackoffRetry(
+                        config.getBaseSleepTime(),
+                        config.getNumberOfRetries()
+                ));
     }
 
     @After
@@ -33,6 +50,7 @@ public class MasterElectorTest {
         final int[] i = new int[1];
 
         final Object mutex = new Object();
+
         MasterElector masterElector = new MasterElector(new Daemon(500) {
             @Override
             protected boolean work() throws Exception {
@@ -47,7 +65,7 @@ public class MasterElectorTest {
                 }
                 return true;
             }
-        }, new MasterElectorConfig(testingCluster.getConnectString(), "/root"));
+        }, curatorFramework, config);
 
         masterElector.start();
         synchronized (mutex){
@@ -78,7 +96,7 @@ public class MasterElectorTest {
                 shutdown();
                 return true;
             }
-        }, new MasterElectorConfig(testingCluster.getConnectString(), "/root"));
+        }, curatorFramework, config);
 
 
         MasterElector masterElector2 = new MasterElector(new Daemon(500) {
@@ -94,7 +112,7 @@ public class MasterElectorTest {
                 shutdown();
                 return true;
             }
-        }, new MasterElectorConfig(testingCluster.getConnectString(), "/root"));
+        }, getCuratorFramework(config), config);
 
         masterElector1.start();
         masterElector2.start();
