@@ -3,8 +3,10 @@ package flipkart.wolverine.core;
 import flipkart.wolverine.daemon.ControlledThread;
 import flipkart.wolverine.model.MasterElectorConfig;
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListener;
+import org.apache.curator.retry.ExponentialBackoffRetry;
 
 /*
     Main starting point of the elector code base. The @MasterElector takes a job and config to connect.
@@ -21,6 +23,9 @@ public class MasterElector {
     private final String leaderPath;
     private LeaderSelector leaderSelector;
 
+    public MasterElector(ControlledThread job, MasterElectorConfig config) {
+        this(job, getCuratorFramework(config), config);
+    }
 
     public MasterElector(ControlledThread job, CuratorFramework curatorFramework, MasterElectorConfig config) {
         this.job = job;
@@ -28,6 +33,16 @@ public class MasterElector {
         this.curatorFramework.start();
         this.leaderPath = config.getLeaderPath() ;
     }
+
+    private static CuratorFramework getCuratorFramework(MasterElectorConfig config) {
+        return  CuratorFrameworkFactory.newClient(
+                config.zookeeperConnect(),
+                new ExponentialBackoffRetry(
+                        config.getBaseSleepTime(),
+                        config.getNumberOfRetries()
+                ));
+    }
+
 
     /*
         Need to start for becoming part of leader group.
