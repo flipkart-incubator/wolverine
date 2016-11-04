@@ -15,7 +15,6 @@ import java.util.concurrent.Semaphore;
 
 public class MasterElectorTest {
 
-
     private TestingCluster testingCluster;
     private CuratorFramework curatorFramework;
     private MasterElectorConfig config;
@@ -51,7 +50,8 @@ public class MasterElectorTest {
 
         final Object mutex = new Object();
 
-        MasterElector masterElector = new MasterElector(new Daemon(500) {
+        ExponentialBackOffSleepStrategy sleepStrategy = new ExponentialBackOffSleepStrategy(500);
+        MasterElector masterElector = new MasterElector(new Daemon(sleepStrategy) {
             @Override
             protected boolean work() throws Exception {
                 i[0]++;
@@ -83,7 +83,8 @@ public class MasterElectorTest {
         final Semaphore s = new Semaphore(2);
         s.acquire(2);
 
-        MasterElector masterElector1 = new MasterElector(new Daemon(500) {
+        ExponentialBackOffSleepStrategy sleepStrategy = new ExponentialBackOffSleepStrategy(500);
+        MasterElector masterElector1 = new MasterElector(new Daemon(sleepStrategy) {
             @Override
             protected boolean work() throws Exception {
                 i[0]++;
@@ -99,7 +100,7 @@ public class MasterElectorTest {
         }, curatorFramework, config);
 
 
-        MasterElector masterElector2 = new MasterElector(new Daemon(500) {
+        MasterElector masterElector2 = new MasterElector(new Daemon(sleepStrategy) {
             @Override
             protected boolean work() throws Exception {
                 i[1]++;
