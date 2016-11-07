@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
   An implementation of ControlledThread with a specific sleep strategy
 */
 public abstract class Daemon implements ControlledThread {
+
     private static final Logger logger = LoggerFactory.getLogger(Daemon.class);
     private final SleepStrategy sleepStrategy;
     private final String daemonName;
@@ -30,14 +31,14 @@ public abstract class Daemon implements ControlledThread {
     @Override
     public void run() {
         alive = true;
-        logger.info("{} started.", daemonName);
+        logger.info("Starting {}", daemonName);
         while (alive) {
             WorkStatus workStatus;
             try {
                 boolean success = work();
                 workStatus = success ? WorkStatus.SUCCESS : WorkStatus.FAILURE;
             } catch (Exception e) {
-                logger.error("Caught exception while running {}", daemonName);
+                logger.warn("Caught exception while running {}: ", daemonName, e);
                 workStatus = WorkStatus.EXCEPTION;
             }
             sleepStrategy.sleep(workStatus);
